@@ -22,11 +22,11 @@
  *	x0 - bytes not copied
  */
 	.macro ldrb1 reg, ptr, val
-	uao_user_alternative 9998f, ldrb, ldtrb, \reg, \ptr, \val
+	uao_user_alternative 9997f, ldrb, ldtrb, \reg, \ptr, \val
 	.endm
 
 	.macro strb1 reg, ptr, val
-	uao_user_alternative 9998f, strb, sttrb, \reg, \ptr, \val
+	uao_user_alternative 9997f, strb, sttrb, \reg, \ptr, \val
 	.endm
 
 	.macro ldrh1 reg, ptr, val
