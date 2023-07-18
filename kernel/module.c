@@ -3552,7 +3552,7 @@ int __weak module_frob_arch_sections(Elf_Ehdr *hdr,
 static char *module_blacklist;
 static char *custom_module_blacklist[] = {
     /* Not required */
-    "qca6750",
+    "qca6750", "atmel_mxt_ts", "focaltech_fts", "nt36xxx_i2c", "nt36xxx_spi", "synaptics_dsx",
     /* Useless logs */
     "cameralog", "f_fs_ipc_log", "mi_log",
     /* Debug */
