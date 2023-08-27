@@ -406,11 +406,11 @@ print0:
 
 static int lock_trace(struct task_struct *task)
 {
-	int err = down_read_killable(&task->signal->exec_update_lock);
+	int err = mutex_lock_killable(&task->signal->exec_update_mutex);
 	if (err)
 		return err;
 	if (!ptrace_may_access(task, PTRACE_MODE_ATTACH_FSCREDS)) {
-		up_read(&task->signal->exec_update_lock);
+		mutex_unlock(&task->signal->exec_update_mutex);
 		return -EPERM;
 	}
 	return 0;
@@ -418,7 +418,7 @@ static int lock_trace(struct task_struct *task)
 
 static void unlock_trace(struct task_struct *task)
 {
-	up_read(&task->signal->exec_update_lock);
+	mutex_unlock(&task->signal->exec_update_mutex);
 }
 
 #ifdef CONFIG_STACKTRACE
@@ -2944,7 +2944,7 @@ static int do_io_accounting(struct task_struct *task, struct seq_file *m, int wh
 	unsigned long flags;
 	int result;
 
-	result = down_read_killable(&task->signal->exec_update_lock);
+	result = mutex_lock_killable(&task->signal->exec_update_mutex);
 	if (result)
 		return result;
 
@@ -2980,7 +2980,7 @@ static int do_io_accounting(struct task_struct *task, struct seq_file *m, int wh
 	result = 0;
 
 out_unlock:
-	up_read(&task->signal->exec_update_lock);
+	mutex_unlock(&task->signal->exec_update_mutex);
 	return result;
 }
 
