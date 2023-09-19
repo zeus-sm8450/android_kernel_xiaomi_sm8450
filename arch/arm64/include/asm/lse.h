@@ -19,8 +19,11 @@
 extern struct static_key_false cpu_hwcap_keys[ARM64_NCAPS];
 extern struct static_key_false arm64_const_caps_ready;
 
-/* Always use LSE atomics */
-#define system_uses_lse_atomics() true
+static inline bool system_uses_lse_atomics(void)
+{
+	return (static_branch_likely(&arm64_const_caps_ready)) &&
+		static_branch_likely(&cpu_hwcap_keys[ARM64_HAS_LSE_ATOMICS]);
+}
 
 #define __lse_ll_sc_body(op, ...)					\
 ({									\
