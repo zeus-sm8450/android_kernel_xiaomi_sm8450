@@ -1,22 +1,13 @@
-/*
- * netlink interface
- *
- * Copyright (c) 2017 Goodix
- */
 #include <linux/init.h>
 #include <linux/module.h>
-#include <linux/timer.h>
-#include <linux/time.h>
-#include <linux/types.h>
 #include <net/sock.h>
 #include <net/netlink.h>
 
 #define NETLINK_TEST 25
 #define MAX_MSGSIZE 32
-int stringlength(char *s);
-void sendnlmsg(char *message);
+
+static struct sock *nl_sk;
 static int pid = -1;
-struct sock *nl_sk;
 
 void sendnlmsg(char *message)
 {
@@ -46,7 +37,7 @@ void sendnlmsg(char *message)
 	ret = netlink_unicast(nl_sk, skb_1, pid, MSG_DONTWAIT);
 
 	if (!ret) {
-		/*kfree_skb(skb_1); */
+		kfree_skb(skb_1);
 		pr_err("send msg from kernel to usespace failed ret 0x%x\n",
 		       ret);
 	}
@@ -71,10 +62,8 @@ int netlink_init(void)
 {
 	struct netlink_kernel_cfg netlink_cfg;
 	memset(&netlink_cfg, 0, sizeof(struct netlink_kernel_cfg));
-	netlink_cfg.groups = 0;
-	netlink_cfg.flags = 0;
 	netlink_cfg.input = nl_data_ready;
-	netlink_cfg.cb_mutex = NULL;
+
 	nl_sk = netlink_kernel_create(&init_net, NETLINK_TEST, &netlink_cfg);
 
 	if (!nl_sk) {
@@ -94,3 +83,8 @@ void netlink_exit(void)
 
 	pr_info("self module exited\n");
 }
+
+module_init(netlink_init);
+module_exit(netlink_exit);
+
+MODULE_LICENSE("GPL");
