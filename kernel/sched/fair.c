@@ -10885,7 +10885,6 @@ static bool _nohz_idle_balance(struct rq *this_rq, unsigned int flags,
 	unsigned long next_balance = now + 60*HZ;
 	bool has_blocked_load = false;
 	int update_next_balance = 0;
-	int this_cpu = this_rq->cpu;
 	int balance_cpu;
 	int ret = false;
 	struct rq *rq;
@@ -10909,7 +10908,7 @@ static bool _nohz_idle_balance(struct rq *this_rq, unsigned int flags,
 	smp_mb();
 
 	for_each_cpu(balance_cpu, nohz.idle_cpus_mask) {
-		if (balance_cpu == this_cpu || !idle_cpu(balance_cpu))
+		if (!idle_cpu(balance_cpu))
 			continue;
 
 		/*
@@ -10957,7 +10956,7 @@ static bool _nohz_idle_balance(struct rq *this_rq, unsigned int flags,
 
 	/* Newly idle CPU doesn't need an update */
 	if (idle != CPU_NEWLY_IDLE) {
-		update_blocked_averages(this_cpu);
+		update_blocked_averages(this_rq->cpu);
 		has_blocked_load |= this_rq->has_blocked_load;
 	}
 
